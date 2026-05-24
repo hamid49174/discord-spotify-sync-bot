@@ -1,0 +1,30 @@
+services:
+  bot:
+    build: .
+    env_file:
+      - .env
+    environment:
+      LAVALINK_HOST: lavalink
+      HTTP_HOST: 0.0.0.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - bot-data:/app/data
+    depends_on:
+      lavalink:
+        condition: service_started
+    restart: unless-stopped
+
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:4
+    environment:
+      LAVALINK_PASSWORD: ${LAVALINK_PASSWORD:-youshallnotpass}
+      _JAVA_OPTIONS: "-Xmx512m"
+    ports:
+      - "2333:2333"
+    volumes:
+      - ./lavalink/application.yml:/opt/Lavalink/application.yml:ro
+    restart: unless-stopped
+
+volumes:
+  bot-data:
